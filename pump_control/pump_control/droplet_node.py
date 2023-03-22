@@ -6,7 +6,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float64
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-from pump_control.pump_control.flow_detector import *
+from .flow_detector import *
 
 
 class DropletDetector(Node):
@@ -168,7 +168,7 @@ def main(args=None):
     if args is None:
         args = sys.argv
     
-    with open("/home/bram/ros2_ws/pump_control/pump_control/config.txt", 'r') as file:
+    with open("/home/bram/ros2_ws2/pump_control/pump_control/config.txt", 'r') as file:
         config_dict = {}
         for line in file:
             if line[0] != '#':  #ignores comments

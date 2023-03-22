@@ -7,7 +7,7 @@ from rclpy.node             import Node
 from sensor_msgs.msg        import Image
 from geometry_msgs.msg      import Point
 from cv_bridge              import CvBridge, CvBridgeError
-from pump_control.pump_control.flow_detector import *
+from .flow_detector import *
 
 class FlowDetector(Node):
 
