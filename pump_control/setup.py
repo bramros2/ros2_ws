@@ -27,7 +27,8 @@ setup(
         	'keycontrol = pump_control.KeypressControl:main',
         	'teleoppump = pump_control.teleop_pumps:main',
         	'dino	    = pump_control.dinolite:main',
-        	'drop_find  = pump_control.droplet_node:main'
+        	'drop_find  = pump_control.droplet_node:main',
+        	'plot	    = pump_control.size_plot:main'
         ],
     },
 )
