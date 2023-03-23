@@ -79,5 +79,5 @@ class RangeDetector:
                 break
 
 
-detector = RangeDetector(range_filter='HSV', webcam = True)
-detector.run()
+range = RangeDetector(range_filter= 'HSV', webcam=True)
+range.run()
