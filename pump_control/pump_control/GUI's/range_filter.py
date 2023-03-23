@@ -1,18 +1,50 @@
-import sys
-import re
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QSlider, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox, \
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QSlider, QMessageBox, \
     QFileDialog
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+import sys
+import cv2
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
+import numpy as np
+import re
 
-
-class SettingsPage(QWidget):
+class VideoThread(QThread):
+    change_pixmap_signal = pyqtSignal(np.ndarray)
 
     def __init__(self):
         super().__init__()
+        self._run_flag = True
 
-        self.initUI()
+    def run(self):
+        # capture from webcam
+        cap = cv2.VideoCapture(0)
+        while self._run_flag:
+            ret, cv_img = cap.read()
+            if ret:
+                self.change_pixmap_signal.emit(cv_img)
 
-    def initUI(self):
+        # shut down capture system
+        cap.release()
+
+    def stop(self):
+        """Sets run flag to False and waits for thread to finish"""
+        self._run_flag = False
+        self.wait()
+
+class App(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Range Detector")
+        self.disply_width = 640
+        self.display_height = 480
+        # create the label that holds the image
+        self.image_label = QLabel(self)
+        self.image_label.resize(self.disply_width, self.display_height)
+        self.image_label2 = QLabel(self)
+        self.image_label2.resize(self.disply_width,self.display_height)
+        # create a text label
+        self.textLabel = QLabel('Webcam')
+        self.textLabel2 = QLabel('Threshold')
 
         self.hmin = 0
         self.smin = 0
@@ -81,57 +113,105 @@ class SettingsPage(QWidget):
         load_button = QPushButton('Load')
         load_button.clicked.connect(self.on_load_button_clicked)
 
-        layout = QVBoxLayout()
+        # create a vertical box layout and add the two labels
+        top_layout1 = QVBoxLayout()
+        top_layout2 = QVBoxLayout()
+
+        top_layout1.addWidget(self.textLabel)
+        top_layout1.addWidget(self.image_label)
+
+        # set the vbox layout as the widgets layout
+        top_layout2.addWidget(self.textLabel2)
+        top_layout2.addWidget(self.image_label2)
+
+        # set the vbox layout as the widgets layout
+        bottom_layout = QVBoxLayout()
         hmin_layout = QHBoxLayout()
         hmin_layout.addWidget(hmin_label, alignment=Qt.AlignRight)
         hmin_layout.addWidget(self.hmin_slider, alignment=Qt.AlignRight)
         hmin_layout.addWidget(self.hmin_val_label, alignment=Qt.AlignRight)
-        layout.addLayout(hmin_layout)
+        bottom_layout.addLayout(hmin_layout)
 
         smin_layout = QHBoxLayout()
         smin_layout.addWidget(smin_label, alignment=Qt.AlignRight)
         smin_layout.addWidget(self.smin_slider, alignment=Qt.AlignRight)
         smin_layout.addWidget(self.smin_val_label, alignment=Qt.AlignRight)
-        layout.addLayout(smin_layout)
+        bottom_layout.addLayout(smin_layout)
 
         vmin_layout = QHBoxLayout()
         vmin_layout.addWidget(vmin_label, alignment=Qt.AlignRight)
         vmin_layout.addWidget(self.vmin_slider, alignment=Qt.AlignRight)
         vmin_layout.addWidget(self.vmin_val_label, alignment=Qt.AlignRight)
-        layout.addLayout(vmin_layout)
+        bottom_layout.addLayout(vmin_layout)
 
         hmax_layout = QHBoxLayout()
         hmax_layout.addWidget(hmax_label, alignment=Qt.AlignRight)
         hmax_layout.addWidget(self.hmax_slider, alignment=Qt.AlignRight)
         hmax_layout.addWidget(self.hmax_val_label, alignment=Qt.AlignRight)
-        layout.addLayout(hmax_layout)
+        bottom_layout.addLayout(hmax_layout)
 
         smax_layout = QHBoxLayout()
         smax_layout.addWidget(smax_label, alignment=Qt.AlignRight)
         smax_layout.addWidget(self.smax_slider, alignment=Qt.AlignRight)
         smax_layout.addWidget(self.smax_val_label, alignment=Qt.AlignRight)
-        layout.addLayout(smax_layout)
+        bottom_layout.addLayout(smax_layout)
 
         vmax_layout = QHBoxLayout()
         vmax_layout.addWidget(vmax_label, alignment=Qt.AlignRight)
         vmax_layout.addWidget(self.vmax_slider, alignment=Qt.AlignRight)
         vmax_layout.addWidget(self.vmax_val_label, alignment=Qt.AlignRight)
-        layout.addLayout(vmax_layout)
+        bottom_layout.addLayout(vmax_layout)
 
-        layout.addWidget(save_button)
-        layout.addWidget(load_button)
+        bottom_layout.addWidget(save_button)
+        bottom_layout.addWidget(load_button)
 
+        top_layout = QHBoxLayout()
+        top_layout.addLayout(top_layout1)
+        top_layout.addLayout(top_layout2)
+
+        layout = QVBoxLayout()
+        layout.addLayout(top_layout)
+        layout.addLayout(bottom_layout)
         self.setLayout(layout)
-        self.setGeometry(800,600,700,500)
-        self.setFixedSize(800,600)
-        self.setWindowTitle('Settings')
 
-        self.hmin_slider.setFixedWidth(200)
-        self.smin_slider.setFixedWidth(200)
-        self.vmin_slider.setFixedWidth(200)
-        self.hmax_slider.setFixedWidth(200)
-        self.smax_slider.setFixedWidth(200)
-        self.vmax_slider.setFixedWidth(200)
+        # create the video capture thread
+        self.thread = VideoThread()
+        # connect its signal to the update_image slot
+        self.thread.change_pixmap_signal.connect(self.update_image)
+        # start the thread
+        self.thread.start()
+
+    def closeEvent(self, event):
+        self.thread.stop()
+        event.accept()
+
+    @pyqtSlot(np.ndarray)
+    def update_image(self, cv_img):
+        """Updates the image_label with a new opencv image"""
+        qt_img = self.convert_cv_qt(cv_img)
+        self.image_label.setPixmap(qt_img)
+        frame_to_thresh = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
+        thresh = cv2.inRange(frame_to_thresh, (self.hmin, self.smin, self.vmin), (self.hmax, self.smax, self.vmax))
+        qt_img2 = self.convert_cv_qt2(thresh)
+        self.image_label2.setPixmap(qt_img2)
+
+    def convert_cv_qt(self, cv_img):
+        """Convert from an opencv image to QPixmap"""
+        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb_image.shape
+        bytes_per_line = ch * w
+        convert_to_Qt_format = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+        p = convert_to_Qt_format.scaled(self.disply_width, self.display_height, Qt.KeepAspectRatio)
+        return QPixmap.fromImage(p)
+
+    def convert_cv_qt2(self, cv_img):
+        """Convert from an opencv image to QPixmap"""
+        gray_image = cv_img
+        h, w = gray_image.shape
+        bytes_per_line = 1 * w
+        convert_to_Qt_format = QtGui.QImage(gray_image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+        p = convert_to_Qt_format.scaled(self.disply_width, self.display_height, Qt.KeepAspectRatio)
+        return QPixmap.fromImage(p)
 
     def on_hmin_slider_changed(self, value):
         if self.hmax <= value:
@@ -242,8 +322,8 @@ class SettingsPage(QWidget):
                 else:
                     QMessageBox.warning(self, "Invalid File", "The file does not contain the correct number of values.")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = SettingsPage()
-    window.show()
+    a = App()
+    a.show()
     sys.exit(app.exec_())
