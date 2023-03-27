@@ -107,10 +107,16 @@ class App(QWidget):
         self.vmax_slider.valueChanged.connect(self.on_vmax_slider_changed)
         self.vmax_val_label = QLabel(str(self.vmax))
 
+        reset_button = QPushButton('Reset')
+        reset_button.setFixedWidth(100)
+        reset_button.clicked.connect(self.on_reset_button_clicked)
+
         save_button = QPushButton('Save')
+        save_button.setFixedWidth(100)
         save_button.clicked.connect(self.on_save_button_clicked)
 
         load_button = QPushButton('Load')
+        load_button.setFixedWidth(100)
         load_button.clicked.connect(self.on_load_button_clicked)
 
         # create a vertical box layout and add the two labels
@@ -125,6 +131,11 @@ class App(QWidget):
         top_layout2.addWidget(self.image_label2)
 
         # set the vbox layout as the widgets layout
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(save_button, alignment= Qt.AlignCenter)
+        button_layout.addWidget(load_button, alignment=Qt.AlignCenter)
+        button_layout.addWidget(reset_button, alignment=Qt.AlignCenter)
+
         bottom_layout = QVBoxLayout()
         hmin_layout = QHBoxLayout()
         hmin_layout.addWidget(hmin_label, alignment=Qt.AlignRight)
@@ -162,8 +173,9 @@ class App(QWidget):
         vmax_layout.addWidget(self.vmax_val_label, alignment=Qt.AlignRight)
         bottom_layout.addLayout(vmax_layout)
 
-        bottom_layout.addWidget(save_button)
-        bottom_layout.addWidget(load_button)
+        bottom_layout.addLayout(button_layout)
+        #bottom_layout.addWidget(save_button)
+        #bottom_layout.addWidget(load_button)
 
         top_layout = QHBoxLayout()
         top_layout.addLayout(top_layout1)
@@ -254,6 +266,29 @@ class App(QWidget):
         self.vmax = value
         self.vmax_slider.setValue(self.vmax)
         self.vmax_val_label.setText(str(value))
+
+    def on_reset_button_clicked(self):
+        self.reset_sliders()
+
+    def reset_sliders(self):
+        self.hmin = 0
+        self.hmin_slider.setValue(self.hmin)
+        self.hmin_val_label.setText(str(self.hmin))
+        self.smin = 0
+        self.smin_slider.setValue(self.smin)
+        self.smin_val_label.setText(str(self.smin))
+        self.vmin = 0
+        self.vmin_slider.setValue(self.vmin)
+        self.vmin_val_label.setText(str(self.vmin))
+        self.hmax = 255
+        self.hmax_slider.setValue(self.hmax)
+        self.hmax_val_label.setText(str(self.hmax))
+        self.smax = 255
+        self.smax_slider.setValue(self.smax)
+        self.smax_val_label.setText(str(self.smax))
+        self.vmax = 255
+        self.vmax_slider.setValue(self.vmax)
+        self.vmax_val_label.setText(str(self.vmax))
 
     def on_save_button_clicked(self):
         if self.hmin >= self.hmax or self.smin >= self.smax or self.vmin >= self.vmax:
