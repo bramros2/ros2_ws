@@ -6,20 +6,21 @@ from std_msgs.msg import Float64
 class PIDControllerNode(Node):
     def __init__(self):
         super().__init__('pid_controller')
+        self.get_logger().info("PID node initialized")
 
         # Initialize PID controller with some parameters
-        self.Kp = 0.5  # Proportional gain
+        self.Kp = 0.2  # Proportional gain
         self.Ki = 0.1  # Integral gain
-        self.Kd = 0.2  # Derivative gain
+        self.Kd = 0.1  # Derivative gain
         self.min_ref = -10  # Minimum reference value
         self.max_ref = 10  # Maximum reference value
-        self.min_output = 0  # Minimum output value
-        self.max_output = 20  # Maximum output value
+        self.min_output = 0.01  # Minimum output value
+        self.max_output = 2.0  # Maximum output value
         self.integral = 0  # Integral term
         self.last_error = 0  # Last error value
         self.last_time = self.get_clock().now()  # Last time the callback was called
         self.feedrate = 0  # Feedrate value
-        self.wanted_width = 1  # Desired width of the object to be tracked.                   #TODO: Change to read from settings instead of hardcoded
+        self.wanted_width = 10  # Desired width of the object to be tracked.                   #TODO: Change to read from settings instead of hardcoded
 
         # Create a subscription to the feedrate topic
         self.feedrate_subscription = self.create_subscription(
@@ -71,10 +72,12 @@ class PIDControllerNode(Node):
         # Limit the control signal to the specified range
         control_signal = max(control_signal, self.min_output)
         control_signal = min(control_signal, self.max_output)
+        self.get_logger().info("New feedback rate")
+        self.get_logger().info(control_signal)
 
         # Publish the control signal as a Float64 message
         control_signal_msg = Float64()
-        control_signal_msg.data = control_signal
+        control_signal_msg.data = float(control_signal)
         self.publisher.publish(control_signal_msg)
         self.feedrate = control_signal
 

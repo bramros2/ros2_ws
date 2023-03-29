@@ -8,6 +8,8 @@ from std_msgs.msg           import String
 class KeyController(Node):
     def __init__(self):
         super().__init__('key_controller')
+        self.get_logger().info("Keypress Control node initialized")
+
         # subscribe to keyboard input topic
         self.pumps_initialized = False
         self.subscription = self.create_subscription(String, '/keyboard_input',  self.keyboard_input_callback, 1)
@@ -51,7 +53,7 @@ class KeyController(Node):
         if key == 'x':
             command = 'G1 X{:.2f} F{:.2f}\n'.format(2,8)
         elif key == 'y':
-            command = 'G1 Y{:.2f} F{:.2f}\n'.format(2,8)
+            command = 'G1 Y{:.2f} F{:.2f}\n'.format(-5,5)
         elif key == 'z':
             command = 'G1 Z{:.2f} F{:.2f}\n'.format(2,8)
         elif key == 'o':
@@ -61,7 +63,7 @@ class KeyController(Node):
         elif key == 'b':
             command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:.2f}\n'.format(1,1,1,8)
         elif key == 'p':
-            command = 'G1 X{:.2f} Y{:.2f} F{:.2f}\n'.format(1,1,8)
+            command = 'G1 X{:.2f} Y{:.2f} F{:.2f}\n'.format(1,1,0.1)
         
         if command != None and self.pumps_initialized == True:
             self.ser.write(command.encode())

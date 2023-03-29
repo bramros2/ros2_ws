@@ -168,30 +168,40 @@ def main(args=None):
     if args is None:
         args = sys.argv
     
-    with open("/home/bram/ros2_ws2/pump_control/pump_control/config.txt", 'r') as file:
-        config_dict = {}
-        for line in file:
-            if line[0] != '#':  #ignores comments
-                line = line.strip('\n')
-                line = line.split()
-                for elem in line:
-                    if elem.isdigit():
-                        value = int(elem)                   #MAKE SURE NO FLOATS ARE NEEDED FOR VALUES IN SETTINGS
-                    elif elem != '=':    #ignores the = sign
-                        identifier = elem
-                config_dict[identifier] = value
-    hsv_min = (config_dict['hmin'],config_dict['smin'],config_dict['vmin'])
-    hsv_max = (config_dict['hmax'],config_dict['smax'],config_dict['vmax'])
+    #with open("/home/bram/ros2_ws2/pump_control/pump_control/config.txt", 'r') as file:
+    #    config_dict = {}
+    #    for line in file:
+    #        if line[0] != '#':  #ignores comments
+    #            line = line.strip('\n')
+    #            line = line.split()
+    #            for elem in line:
+    #                if elem.isdigit():
+    #                    value = int(elem)                   #MAKE SURE NO FLOATS ARE NEEDED FOR VALUES IN SETTINGS
+    #                elif elem != '=':    #ignores the = sign
+    #                    identifier = elem
+    #            config_dict[identifier] = value
+    #hsv_min = (config_dict['hmin'],config_dict['smin'],config_dict['vmin'])
+    #hsv_max = (config_dict['hmax'],config_dict['smax'],config_dict['vmax'])
 
-    blur = config_dict['blur']
-    min_size = config_dict['min_size']
-    max_size = config_dict['max_size']
+    hmin = 135
+    smin = 000
+    vmin = 79
+    hmax = 172
+    smax = 255
+    vmax = 139
+
+    hsv_min = (hmin,smin,vmin)
+    hsv_max = (hmax,smax,vmax)
+
+    blur =  5# config_dict['blur']
+    min_size = 10 #config_dict['min_size']
+    max_size = 40 #config_dict['max_size']
 
     #--- detection window respect to camera frame in [x_min, y_min, x_max, y_max] adimensional (0 to 1)
-    x_min   = 0.1
-    x_max   = 0.9
-    y_min   = 0.1
-    y_max   = 0.9
+    x_min   = 0.0
+    x_max   = 1.0
+    y_min   = 0.35
+    y_max   = 0.45
 
     detection_window = [x_min, y_min, x_max, y_max]
 

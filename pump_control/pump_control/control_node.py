@@ -9,6 +9,7 @@ from std_msgs.msg           import Float64
 class Controller(Node):
     def __init__(self):
         super().__init__('controller')
+        self.get_logger().info("Control node initialized")
         # subscribe to keyboard input topic
         self.pumps_initialized = False
         self.pid_subscription = self.create_subscription(Float64(), 'control_signal_topic',  self.pid_input_callback, 1)
@@ -47,17 +48,20 @@ class Controller(Node):
         self.pumps_initialized = True
         self.get_logger().info('Ender3 initialised')
 
-        command = 'G1 X{:.2f} Y{:.2f} Z{:2.f} F{:.2f}\n'.format(0.5,0.5,0.5,0.01) 
+        command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:f}\n'.format(1.0,0.5,0.5,0.01) 
         if command != None and self.pumps_initialized == True:
             self.ser.write(command.encode())
             response = self.ser.readline()
             self.get_logger().info('Pumps started with X0.5 Y0.5 Z0.5 F0.01')
             init_feedrate = 0.01
-            self.feedrate_publisher.publish(init_feedrate)
+            self.feedpub = Float64()
+            print('Inital feedrate = ' + str(init_feedrate))
+            self.feedpub.data = init_feedrate
+            self.feedrate_publisher.publish(0.01)
 
     def start_pump(self, feedrate):
         # send Gcode command to move a pump
-        command = 'G1 X{:.2f} Y{:.2f} Z{:2.f} F{:.2f}\n'.format(0.5,0.5,0.5,feedrate)           #TODO: read ratios from settings instead of hardcoding
+        command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:f}\n'.format(1.0,0.5,0.5,feedrate)           #TODO: read ratios from settings instead of hardcoding
         if command != None and self.pumps_initialized == True:
             self.ser.write(command.encode())
             self.get_logger().info('New command sent: ' + command)
@@ -75,7 +79,6 @@ class Controller(Node):
 # main function
 def main():
     # create a node
-    # start the motor control loop
     rclpy.init()
     controller = Controller()
     rclpy.spin(controller)

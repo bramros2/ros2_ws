@@ -24,11 +24,13 @@ setup(
         	'flow_find  = pump_control.flow_node:main',
         	'point      = pump_control.point_node:main',
         	'mask       = pump_control.mask_node:main',
-        	'keycontrol = pump_control.KeypressControl:main',
+        	'keycontrol = pump_control.keypress_control:main',
         	'teleoppump = pump_control.teleop_pumps:main',
         	'dino	    = pump_control.dinolite:main',
         	'drop_find  = pump_control.droplet_node:main',
-        	'plot	    = pump_control.size_plot:main'
+        	'plot	    = pump_control.size_plot:main',
+        	'pid	    = pump_control.PID_controller:main', 
+        	'control    = pump_control.control_node:main'
         ],
     },
 )
