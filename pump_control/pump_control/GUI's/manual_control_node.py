@@ -70,7 +70,7 @@ def main():
     # create a node
     # start the motor control loop
     rclpy.init()
-    key_controller = KeyController()
+    key_controller = SerialController()
     rclpy.spin(key_controller)
 
     key_controller.destroy_node()
