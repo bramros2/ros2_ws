@@ -183,12 +183,12 @@ def main(args=None):
     #hsv_min = (config_dict['hmin'],config_dict['smin'],config_dict['vmin'])
     #hsv_max = (config_dict['hmax'],config_dict['smax'],config_dict['vmax'])
 
-    hmin = 135
-    smin = 000
-    vmin = 79
-    hmax = 172
-    smax = 255
-    vmax = 139
+    hmin = 157
+    smin = 41
+    vmin = 7
+    hmax = 167
+    smax = 172
+    vmax = 154
 
     hsv_min = (hmin,smin,vmin)
     hsv_max = (hmax,smax,vmax)

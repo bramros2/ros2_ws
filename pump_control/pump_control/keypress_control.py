@@ -60,13 +60,14 @@ class KeyController(Node):
         elif key == 'o':
             command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:.2f}\n'.format(-10,-10,-10,10)
         elif key == 'a':
-            command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:.2f}\n'.format(1,1,1,1)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.04,0.008,0,0.2)
         elif key == 'b':
-            command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:.2f}\n'.format(1,1,1,8)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.04,0.004,0,0.1)
         elif key == 'p':
-            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.00167,0.000835,0,0.01) 
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.04,0.004,0,0.5) 
         
         if command != None and self.pumps_initialized == True:
+            self.get_logger().info(command)
             self.ser.write(command.encode())
             response = self.ser.readline()
             self.get_logger().info(response)
