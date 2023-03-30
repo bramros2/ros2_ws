@@ -32,6 +32,7 @@ class KeyController(Node):
         M205 X0.40 Y0.40 Z0.40 E5.00 ;Setup Jerk, jerk is the minimum speed that the motors move
         ; This is the most important setting to tune, it defines how many stepper motor steps equate to 1 mm of syringe movement
         M92 X-4000 Y-4000 Z4000 ; 4000 steps per mm, as measured by Vittorio
+        M92 X-20000 Y-20000 Z-20000 ; 20000 steps per ml from Barts code
         M302 S0 ; print with cold hotend -- This allows cold extrusion, but we aren't doing any, maybe when we use the stepper motor of the extruder too
         M121 ; don't use endstops
         G91 ; relative positioning'''
@@ -63,7 +64,7 @@ class KeyController(Node):
         elif key == 'b':
             command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:.2f}\n'.format(1,1,1,8)
         elif key == 'p':
-            command = 'G1 X{:.2f} Y{:.2f} F{:.2f}\n'.format(1,1,0.1)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.00167,0.000835,0,0.01) 
         
         if command != None and self.pumps_initialized == True:
             self.ser.write(command.encode())
