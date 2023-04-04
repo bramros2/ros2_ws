@@ -183,12 +183,12 @@ def main(args=None):
     #hsv_min = (config_dict['hmin'],config_dict['smin'],config_dict['vmin'])
     #hsv_max = (config_dict['hmax'],config_dict['smax'],config_dict['vmax'])
 
-    hmin = 157
-    smin = 41
-    vmin = 7
-    hmax = 167
-    smax = 172
-    vmax = 154
+    hmin = 160
+    smin = 43
+    vmin = 113
+    hmax = 172
+    smax = 103
+    vmax = 159
 
     hsv_min = (hmin,smin,vmin)
     hsv_max = (hmax,smax,vmax)
@@ -200,8 +200,8 @@ def main(args=None):
     #--- detection window respect to camera frame in [x_min, y_min, x_max, y_max] adimensional (0 to 1)
     x_min   = 0.0
     x_max   = 1.0
-    y_min   = 0.35
-    y_max   = 0.45
+    y_min   = 0.0
+    y_max   = 1.0
 
     detection_window = [x_min, y_min, x_max, y_max]
 

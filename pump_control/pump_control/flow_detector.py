@@ -51,13 +51,13 @@ def blob_detect(image,                  #-- The frame (cv standard)
         cv2.imshow("HSV Mask", mask)
     
     #- dilate makes the in range areas larger
-    mask = cv2.dilate(mask, None, iterations=2)
+    #mask = cv2.dilate(mask, None, iterations=2)
     #- Show HSV Mask
     if imshow:
         cv2.imshow("Dilate Mask", mask)   
         cv2.waitKey(0)
         
-    mask = cv2.erode(mask, None, iterations=2)
+    #mask = cv2.erode(mask, None, iterations=2)
     
     #- Show dilate/erode mask
     if imshow:

@@ -32,7 +32,7 @@ class KeyController(Node):
         M205 X0.40 Y0.40 Z0.40 E5.00 ;Setup Jerk, jerk is the minimum speed that the motors move
         ; This is the most important setting to tune, it defines how many stepper motor steps equate to 1 mm of syringe movement
         M92 X-4000 Y-4000 Z4000 ; 4000 steps per mm, as measured by Vittorio
-        M92 X-20000 Y-20000 Z-20000 ; 20000 steps per ml from Barts code
+        M92 X-20000 Y-20000 Z20000 ; 20000 steps per ml from Barts code
         M302 S0 ; print with cold hotend -- This allows cold extrusion, but we aren't doing any, maybe when we use the stepper motor of the extruder too
         M121 ; don't use endstops
         G91 ; relative positioning'''
@@ -52,20 +52,20 @@ class KeyController(Node):
     def start_pump(self,key):
         # send Gcode command to move a pump
         if key == 'x':
-            command = 'G1 X{:.2f} F{:.2f}\n'.format(2,8)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.1,0.02,0.1,0.5)
         elif key == 'y':
-            command = 'G1 Y{:.2f} F{:.2f}\n'.format(-5,5)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.01,0.0025,0.01,1)
         elif key == 'z':
-            command = 'G1 Z{:.2f} F{:.2f}\n'.format(2,8)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.1,0.03,0.1,1.5)
         elif key == 'o':
-            command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:.2f}\n'.format(-10,-10,-10,10)
+            command = 'G1 X{:.2f} Y{:.2f} Z{:.2f} F{:.2f}\n'.format(0.1,0.035,0.1,0.1)
         elif key == 'a':
-            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.04,0.008,0,0.2)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.1,0.04,0.1,0.1)
         elif key == 'b':
-            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.04,0.004,0,0.1)
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.1,0.045,0.1,0.1)
         elif key == 'p':
-            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.04,0.004,0,0.5) 
-        
+            command = 'G1 X{:.5f} Y{:.5f} Z{:.5f} F{:f}\n'.format(0.1,0,0.1,0.1) 
+    
         if command != None and self.pumps_initialized == True:
             self.get_logger().info(command)
             self.ser.write(command.encode())

@@ -78,6 +78,7 @@ def main():
     finally:
         mess = String()
         mess.data = key
+        print(mess)
         pub.publish(mess)
 
         restoreTerminalSettings(settings)
